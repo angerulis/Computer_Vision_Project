@@ -1,7 +1,9 @@
 import cv2
+import tensorflow as tf
+import numpy as np
 
 # Load the TensorFlow model
-model = tf.saved_model.load('ssd_mobilenet_v1')
+model = tf.saved_model.load('ssd_mobilenet_v1/saved_model')
 
 # Function to run inference on a frame
 def run_inference(model, image):
@@ -31,7 +33,8 @@ def visualize_results(frame, output_dict):
             # Draw rectangle to frame
             frame = cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
 
-            # Draw label (assuming class 3 is 'car', modify as per your model's classes)
+            # Draw label I assume class 3 is 'car', I may modify as per Our model's classes)
+            # I NEED TO VERIFY IF CLASS ID IS 3 FOR CAR FOR GIVEN MODEL
             if classes[i] == 3:
                 label = 'Car'
                 frame = cv2.putText(frame, label, (x_min, y_min-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
@@ -42,7 +45,7 @@ def visualize_results(frame, output_dict):
 # cap = cv2.VideoCapture(0)
 
 # input video
-source_video = 'input_video.mp4'
+source_video = 'traffic_video.mp4'
 cap = cv2.VideoCapture(source_video)
 
 while True:
