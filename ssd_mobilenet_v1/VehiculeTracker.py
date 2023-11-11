@@ -13,3 +13,19 @@ class VehicleTracker:
             if self.is_new_vehicle(detection):
                 self.vehicles[self.next_vehicle_id] = detection
                 self.next_vehicle_id += 1
+
+    def is_new_vehicle(self, detection):
+        # Implement logic to check if a detection corresponds to a new vehicle
+        # This could be based on distance from existing vehicles, size, etc.
+        pass
+
+# In your main loop
+vehicle_tracker = VehicleTracker()
+
+while True:
+    # existing video capture and object detection code
+
+    detections = extract_detections(output_dict)  # You need to write this function
+    vehicle_tracker.update(detections)
+
+    # existing code to display frames
