@@ -3,6 +3,7 @@ import cv2
 # Start video capture
 cap = cv2.VideoCapture(0)
 
+
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -20,5 +21,5 @@ while True:
         break
 
 # When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+cap.release() # frees up the resources associated with the video capture
+cv2.destroyAllWindows() #  closes all open HighGUI windows
