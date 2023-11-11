@@ -1,31 +1,48 @@
 class VehicleTracker:
     def __init__(self):
+        self.vehicles = {}  # Active vehicles being tracked
+        self.lost_vehicles = {}  # Vehicles that have been lost due to occlusion
         self.next_vehicle_id = 0
-        self.vehicles = {}
+        self.max_lost_frames = 10  # Maximum number of frames to keep a lost vehicle
 
     def update(self, detections):
-        # detections would be a list of bounding box coordinates
-        # Implement logic to update the position of tracked vehicles
-        # and to add new vehicles if they don't match existing ones
+        # Update positions of tracked vehicles and add new vehicles
+        # ...
 
-        # Example logic to assign IDs to new vehicles
-        for detection in detections:
-            if self.is_new_vehicle(detection):
-                self.vehicles[self.next_vehicle_id] = detection
-                self.next_vehicle_id += 1
+        # Handle lost vehicles
+        for vehicle_id, vehicle_data in list(self.lost_vehicles.items()):
+            vehicle_data['lost_frames'] += 1
+            if vehicle_data['lost_frames'] > self.max_lost_frames:
+                del self.lost_vehicles[vehicle_id]
+            else:
+                # Try to find this vehicle in the current detections
+                for detection in detections:
+                    if self.is_same_vehicle(vehicle_data, detection):
+                        self.vehicles[vehicle_id] = detection
+                        del self.lost_vehicles[vehicle_id]
+                        break
 
-    def is_new_vehicle(self, detection):
-        # Implement logic to check if a detection corresponds to a new vehicle
-        # This could be based on distance from existing vehicles, size, etc.
-        pass
+    def is_same_vehicle(self, vehicle_data, detection):
+        # Extract the centroid of the lost vehicle and the new detection
+        lost_centroid = vehicle_data['centroid']
+        new_centroid = get_centroid(detection)
 
-# In your main loop
-vehicle_tracker = VehicleTracker()
+        # Calculate the Euclidean distance between the two centroids
+        distance = np.linalg.norm(np.array(lost_centroid) - np.array(new_centroid))
 
-while True:
-    # existing video capture and object detection code
+        # Check if the distance is within an acceptable range
+        if distance > MAX_DISTANCE_THRESHOLD:
+            return False
 
-    detections = extract_detections(output_dict)  # You need to write this function
-    vehicle_tracker.update(detections)
+        # Compare the size (area of the bounding box)
+        lost_size = vehicle_data['size']
+        new_size = get_size(detection)
 
-    # existing code to display frames
+        # Check if the size difference is within an acceptable range
+        size_difference = abs(lost_size - new_size)
+        if size_difference > MAX_SIZE_DIFFERENCE_THRESHOLD:
+            return False
+
+        return True
+
+
